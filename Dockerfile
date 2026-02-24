@@ -1,23 +1,33 @@
 FROM oven/bun:1-alpine AS deps
 WORKDIR /app
 
-COPY package.json ./
+# Copy Canvas package (file:../Canvas dependency)
+COPY Canvas/package.json ../Canvas/package.json
+COPY Canvas/src ../Canvas/src
+
+# Copy app package files
+COPY Hera/package.json ./
 
 RUN bun install --production
 
 FROM oven/bun:1-alpine AS builder
 WORKDIR /app
 
-COPY package.json ./
+# Copy Canvas package
+COPY Canvas/ ../Canvas/
+
+# Copy app source
+COPY Hera/package.json ./
 RUN bun install
 
-COPY . .
+COPY Hera/ .
 
 RUN bun run build
 
 FROM oven/bun:1-alpine AS runner
 WORKDIR /app
 
+RUN apk --no-cache add wget
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
@@ -32,5 +42,8 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
+  CMD wget --spider --quiet http://localhost:3000/health || exit 1
 
 CMD ["bun", "server.js"]

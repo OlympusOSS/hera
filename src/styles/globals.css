@@ -1,0 +1,22 @@
+@import "tailwindcss";
+@import "@olympus/canvas/styles/tokens.css";
+@import "@olympus/canvas/styles/animations.css";
+@import "@olympus/canvas/styles/glass.css";
+
+@layer base {
+	:root {
+		/* Hera-specific tokens (error states not in Canvas base) */
+		--error: 0 84% 60%;
+		--error-foreground: 0 69% 83%;
+	}
+
+	* {
+		border-color: hsl(var(--border));
+	}
+
+	body {
+		background: hsl(var(--background));
+		color: hsl(var(--foreground));
+		font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+	}
+}
