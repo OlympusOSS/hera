@@ -1,4 +1,5 @@
 const KRATOS_PUBLIC_URL = process.env.KRATOS_PUBLIC_URL || "http://localhost:4100";
+const KRATOS_ADMIN_URL = process.env.KRATOS_ADMIN_URL || "http://localhost:4101";
 
 export async function getSession(cookieHeader: string | null) {
 	if (!cookieHeader) return null;
@@ -66,4 +67,23 @@ export function extractCsrfToken(flow: Record<string, unknown>): string {
 	if (!ui?.nodes) return "";
 	const csrfNode = ui.nodes.find((n) => n.attributes?.name === "csrf_token");
 	return csrfNode?.attributes?.value || "";
+}
+
+/**
+ * Revoke all Kratos sessions for a given identity.
+ * Uses the Kratos admin API: DELETE /admin/identities/{id}/sessions
+ * Non-throwing — logs errors but allows logout to proceed.
+ */
+export async function revokeKratosSessions(identityId: string): Promise<void> {
+	const res = await fetch(
+		`${KRATOS_ADMIN_URL}/admin/identities/${identityId}/sessions`,
+		{ method: "DELETE" },
+	);
+
+	if (!res.ok && res.status !== 404) {
+		const text = await res.text().catch(() => "");
+		console.error(
+			`Failed to revoke Kratos sessions for identity ${identityId} (${res.status}): ${text}`,
+		);
+	}
 }
