@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { loginAction } from "./actions";
-import { AnimatedBackground } from "@olympus/canvas";
+import { AnimatedBackground } from "@olympusoss/canvas";
 
 export function LoginForm({ challenge }: { challenge: string }) {
 	const [state, formAction, pending] = useActionState(loginAction, {
